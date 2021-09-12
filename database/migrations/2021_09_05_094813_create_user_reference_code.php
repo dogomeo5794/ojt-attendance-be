@@ -16,7 +16,7 @@ class CreateUserReferenceCode extends Migration
         Schema::create('user_reference_code', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('unique_code_id')->index();
-            $table->string('user_system_id', 20)->index();
+            $table->string('clinic_user_id', 20)->index();
             $table->timestamps();
         });
     }

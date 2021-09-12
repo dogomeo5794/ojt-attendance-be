@@ -21,10 +21,40 @@ class CreateForeignKeys extends Migration
     				'on' => 'uam_unique_code'
 				],
 				[
-    				'foreign' => 'user_system_id',
-    				'ref' => 'user_system_id',
-    				'on' => 'users'
+    				'foreign' => 'clinic_user_id',
+    				'ref' => 'clinic_user_id',
+    				'on' => 'user_information'
     			]
+    		)
+    	),
+		array(
+    		'table' => 'user_information',
+    		'fk' => array(
+    			[
+    				'foreign' => 'user_id',
+    				'ref' => 'id',
+    				'on' => 'users'
+				],
+    		)
+    	),
+		array(
+    		'table' => 'staff_information',
+    		'fk' => array(
+    			[
+    				'foreign' => 'user_id',
+    				'ref' => 'id',
+    				'on' => 'users'
+				],
+    		)
+    	),
+		array(
+    		'table' => 'user_profile_picture',
+    		'fk' => array(
+    			[
+    				'foreign' => 'user_id',
+    				'ref' => 'id',
+    				'on' => 'users'
+				],
     		)
     	),
     );

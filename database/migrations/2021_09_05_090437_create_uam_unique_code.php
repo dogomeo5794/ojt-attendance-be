@@ -16,8 +16,8 @@ class CreateUamUniqueCode extends Migration
         Schema::create('uam_unique_code', function (Blueprint $table) {
             $table->id();
             $table->string('unique_code', 16)->unique();
-            $table->string('user_system_id', 20);
-            $table->enum('status', ['available', 'used', 'expired'])->default('available');
+            $table->string('clinic_user_id', 20);
+            $table->enum('status', ['inactive', 'active', 'used', 'expired'])->default('active');
             $table->timestamps();
         });
     }
