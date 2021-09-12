@@ -9,13 +9,19 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
 use App\UamUniqueCode;
+use App\User;
 
 class UAMController extends Controller
 {
+  public function __construct()
+  {
+    // $this->middleware('auth:api');
+  }
+
   public function generateCode(Request $request)
   {
     $rule = [
-			'user_id_numbers.*.user_system_id' => 'required|distinct|unique:uam_unique_code,user_system_id'
+			'user_id_numbers.*.clinic_user_id' => 'required|distinct|unique:uam_unique_code,clinic_user_id'
 		];
 
   	$valid = Validator::make($request->all(), $rule);
@@ -31,7 +37,7 @@ class UAMController extends Controller
         $collectedValues, 
         array(
           'unique_code' => strtoupper(Str::random(16)),
-          'user_system_id' => $value['user_system_id'],
+          'clinic_user_id' => $value['clinic_user_id'],
           'created_at' => Carbon::now()
         )
       );
@@ -53,25 +59,14 @@ class UAMController extends Controller
     return  response()->json($generateCode);
   }
 
-  public function validateInitReg(Request $request)
+  public function collectUsers(Request $request)
   {
-    $rule = [
-			'user_id' => 'required',
-			'unique_code' => 'required',
-		];
-    $valid = Validator::make($request->all(), $rule);
-  	if ($valid->fails()) {
-  		return response($valid->errors(), 500);
-  	}
+    $per_page = $request->input("per_page")??5;
+    $user_list = User::with(["user_information", "staff_information", "user_profile_picture"])
+      ->orderBy('created_at', 'desc')->paginate($per_page);
 
-    $validatedReg = UamUniqueCode::where([
-      ["unique_code", $request->input("unique_code")],
-      ["user_system_id", $request->input("user_id")],
-    ])->first();
-    if (!$validatedReg) {
-      return  response($request->all(), 404);
-    }
-    return  response()->json($validatedReg);
+    // $user_list = User::orderBy('created_at', 'desc')->paginate(5);
+    return  response()->json($user_list);
   }
 
 }
