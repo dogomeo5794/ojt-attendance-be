@@ -57,6 +57,66 @@ class CreateForeignKeys extends Migration
 				],
     		)
     	),
+		array(
+    		'table' => 'purchase_list',
+    		'fk' => array(
+    			[
+    				'foreign' => 'medicine_list_id',
+    				'ref' => 'id',
+    				'on' => 'medicine_list'
+				],
+				[
+    				'foreign' => 'purchase_id',
+    				'ref' => 'id',
+    				'on' => 'purchase'
+				],
+				[
+    				'foreign' => 'user_id',
+    				'ref' => 'id',
+    				'on' => 'users'
+				],
+    		)
+    	),
+		array(
+    		'table' => 'symptoms',
+    		'fk' => array(
+    			[
+    				'foreign' => 'sickness_list_id',
+    				'ref' => 'id',
+    				'on' => 'sickness_list'
+				]
+    		)
+    	),
+		array(
+    		'table' => 'medication',
+    		'fk' => array(
+    			[
+    				'foreign' => 'medicine_list_id',
+    				'ref' => 'id',
+    				'on' => 'medicine_list'
+				],
+				[
+    				'foreign' => 'symptom_id',
+    				'ref' => 'id',
+    				'on' => 'symptoms'
+				],
+    		)
+    	),
+		array(
+    		'table' => 'medicine_used',
+    		'fk' => array(
+    			[
+    				'foreign' => 'medication_id',
+    				'ref' => 'id',
+    				'on' => 'medication'
+				],
+				[
+    				'foreign' => 'user_id',
+    				'ref' => 'id',
+    				'on' => 'users'
+				],
+    		)
+    	),
     );
 
     public function up()
