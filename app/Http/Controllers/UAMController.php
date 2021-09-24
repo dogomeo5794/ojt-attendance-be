@@ -62,7 +62,8 @@ class UAMController extends Controller
   public function collectUsers(Request $request)
   {
     $per_page = $request->input("per_page")??5;
-    $user_list = User::with(["user_information", "staff_information", "user_profile_picture"])
+    $user_list = User::with(["user_information", "staff_information", "user_profile_picture", "user_details"])
+      ->where("role", "!=", "uam-admin")
       ->orderBy('created_at', 'desc')->paginate($per_page);
 
     // $user_list = User::orderBy('created_at', 'desc')->paginate(5);

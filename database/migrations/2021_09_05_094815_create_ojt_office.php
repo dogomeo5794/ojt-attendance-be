@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePurchase extends Migration
+class CreateOjtOffice extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreatePurchase extends Migration
      */
     public function up()
     {
-        Schema::create('purchase', function (Blueprint $table) {
+        Schema::create('ojt_office', function (Blueprint $table) {
             $table->id();
-            $table->double("total_qty")->default(0);
-            $table->double("left_qty")->default(0);
+            $table->unsignedBigInteger('student_information_id')->index();
+            $table->unsignedBigInteger('office_detail_id')->index();
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ class CreatePurchase extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('purchase');
+        Schema::dropIfExists('ojt_office');
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUserProfilePicture extends Migration
+class CreateImages extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,14 @@ class CreateUserProfilePicture extends Migration
      */
     public function up()
     {
-        Schema::create('user_profile_picture', function (Blueprint $table) {
+        Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->string("image_path", 100);
-            $table->string("image_type", 10);
-            $table->string("image_name", 100);
+            $table->string("image_type", 10)->nullable();
+            $table->string("image_name", 100)->nullable();
+            $table->enum('set_as', ['profile', 'attachment', 'qrcode'])->default('attachment');
             $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->unsignedBigInteger('user_id')->index();
+            $table->unsignedBigInteger('image_id')->index();
             $table->timestamps();
         });
     }
@@ -31,6 +32,6 @@ class CreateUserProfilePicture extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_profile_picture');
+        Schema::dropIfExists('images');
     }
 }

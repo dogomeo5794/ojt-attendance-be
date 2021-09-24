@@ -17,7 +17,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'email', 'password', 'role', 'user_type',
+        'username', 'email', 'password', 'role', 'user_type', 'morph_to'
     ];
 
     /**
@@ -38,16 +38,16 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    public function user_information() {
-        return $this->hasOne('App\UserInformation', 'user_id');
+    public function admin_account() {
+        return $this->hasOne('App\AdminAccount', 'user_id');
     }
 
-    public function staff_information() {
-        return $this->hasOne('App\StaffInformation', 'user_id');
+    public function office_account() {
+        return $this->hasOne('App\OfficeAccount', 'user_id');
     }
 
-    public function user_profile_picture() {
-        return $this->hasMany('App\ProfilePicture', 'user_id');
+    public function user_info() {
+        return $this->morphTo(__FUNCTION__, 'morph_to', 'id');
     }
 
     /**

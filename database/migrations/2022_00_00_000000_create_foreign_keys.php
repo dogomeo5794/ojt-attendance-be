@@ -13,22 +13,22 @@ class CreateForeignKeys extends Migration
      */
     private $tables = array(
     	array(
-    		'table' => 'user_reference_code',
+    		'table' => 'office_account',
     		'fk' => array(
     			[
-    				'foreign' => 'unique_code_id',
+    				'foreign' => 'user_id',
     				'ref' => 'id',
-    				'on' => 'uam_unique_code'
+    				'on' => 'users'
 				],
 				[
-    				'foreign' => 'clinic_user_id',
-    				'ref' => 'clinic_user_id',
-    				'on' => 'user_information'
+    				'foreign' => 'office_detail_id',
+    				'ref' => 'id',
+    				'on' => 'office_details'
     			]
     		)
     	),
 		array(
-    		'table' => 'user_information',
+    		'table' => 'admin_account',
     		'fk' => array(
     			[
     				'foreign' => 'user_id',
@@ -38,82 +38,43 @@ class CreateForeignKeys extends Migration
     		)
     	),
 		array(
-    		'table' => 'staff_information',
+    		'table' => 'attendance',
     		'fk' => array(
     			[
-    				'foreign' => 'user_id',
+    				'foreign' => 'office_account_id',
     				'ref' => 'id',
-    				'on' => 'users'
-				],
-    		)
-    	),
-		array(
-    		'table' => 'user_profile_picture',
-    		'fk' => array(
-    			[
-    				'foreign' => 'user_id',
-    				'ref' => 'id',
-    				'on' => 'users'
-				],
-    		)
-    	),
-		array(
-    		'table' => 'purchase_list',
-    		'fk' => array(
-    			[
-    				'foreign' => 'medicine_list_id',
-    				'ref' => 'id',
-    				'on' => 'medicine_list'
+    				'on' => 'office_account'
 				],
 				[
-    				'foreign' => 'purchase_id',
+    				'foreign' => 'student_information_id',
     				'ref' => 'id',
-    				'on' => 'purchase'
-				],
-				[
-    				'foreign' => 'user_id',
-    				'ref' => 'id',
-    				'on' => 'users'
+    				'on' => 'student_information'
 				],
     		)
     	),
 		array(
-    		'table' => 'symptoms',
+    		'table' => 'ojt_office',
     		'fk' => array(
     			[
-    				'foreign' => 'sickness_list_id',
+    				'foreign' => 'student_information_id',
     				'ref' => 'id',
-    				'on' => 'sickness_list'
-				]
-    		)
-    	),
-		array(
-    		'table' => 'medication',
-    		'fk' => array(
-    			[
-    				'foreign' => 'medicine_list_id',
-    				'ref' => 'id',
-    				'on' => 'medicine_list'
+    				'on' => 'student_information'
 				],
 				[
-    				'foreign' => 'symptom_id',
+    				'foreign' => 'office_detail_id',
     				'ref' => 'id',
-    				'on' => 'symptoms'
+    				'on' => 'office_details'
 				],
     		)
     	),
+
 		array(
-    		'table' => 'medicine_used',
+    		'table' => 'generated_qrcode',
     		'fk' => array(
     			[
-    				'foreign' => 'medication_id',
+    				'foreign' => 'student_information_id',
     				'ref' => 'id',
-    				'on' => 'medication'
-				],
-				[
-    				'foreign' => 'user_id',
-    				'ref' => 'id',
-    				'on' => 'users'
+    				'on' => 'student_information'
 				],
     		)
     	),

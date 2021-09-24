@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMedicineUsed extends Migration
+class CreateGenerateQrCode extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateMedicineUsed extends Migration
      */
     public function up()
     {
-        Schema::create('medicine_used', function (Blueprint $table) {
+        Schema::create('generated_qrcode', function (Blueprint $table) {
             $table->id();
-            $table->longText('description')->nullable();
-            $table->unsignedBigInteger('medication_id')->index();
-            $table->unsignedBigInteger('user_id')->index();
+            $table->string("qrcode_url");
+            $table->unsignedBigInteger('student_information_id')->index();
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreateMedicineUsed extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('medicine_used');
+        Schema::dropIfExists('generated_qrcode');
     }
 }

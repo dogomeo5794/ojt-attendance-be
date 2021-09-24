@@ -24,19 +24,27 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 // Route::prefix('v1')->group(function() {
 Route::group(['middleware' => 'api', 'prefix' => 'v1'], function ($router) {
     /**
-     * UAM Controllers
+     * Account Controllers
      */
-    Route::post('/generate-code', 'UAMController@generateCode');
-    Route::get('/generated-code', 'UAMController@getGeneratedCode');
-    Route::get('/user-list', 'UAMController@collectUsers');
-    /**
-     * Account controllers
-     */
-    Route::post('/validate-init-reg', 'AccountController@validateInitReg');
-    Route::post('/complete-registration', 'AccountController@completeReg');
     Route::post('/user-login', 'AccountController@userLogin');
-    Route::post('/staff-login', 'AccountController@staffLogin');
-    Route::post('/create-staff-account', 'AccountController@createStaffAccount');
+    Route::post('/registration', 'AccountController@registerAccount');
+    Route::post('/search-existing-office', 'AccountController@searchExistingCompany');
+    Route::post('/check-fresh-app', 'AccountController@checkFreshApp');
+
+    /**
+     *  Student Controllers
+     */
+    Route::post('/create-student', 'StudentController@createStudent');
+    Route::get('/create-qr-code', 'StudentController@createQrCode');
+    
+    
+    // Route::post('/validate-init-reg', 'AccountController@validateInitReg');
+    // Route::post('/complete-registration', 'AccountController@completeReg');
+    // Route::post('/staff-login', 'AccountController@staffLogin');
+    // Route::post('/create-staff-account', 'AccountController@createStaffAccount');
+
+    // Route::get('/medicine-list', 'MedicineController@medicineList');
+    // Route::post('/medicine-add', 'MedicineController@medicineAdd');
 });
 
 

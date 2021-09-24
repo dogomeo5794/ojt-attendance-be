@@ -180,6 +180,11 @@ return [
          */
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
 
+        /**
+         * QR code generator
+         */
+        SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class
+
     ],
 
     /*
@@ -237,6 +242,12 @@ return [
          */
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+
+        /**
+         * QR Code Generator
+         */
+
+        'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class
 
     ],
 

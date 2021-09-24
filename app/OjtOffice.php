@@ -4,13 +4,13 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UamUniqueCode extends Model
+class OjtOffice extends Model
 {
-    protected $table = 'uam_unique_code';
+    protected $table = 'ojt_office';
 
     public $timestamps = true;
 
     protected $fillable = [
-        'unique_code', 'user_system_id', 'status'
+        'student_information_id', 'office_detail_id'
     ];
 }
