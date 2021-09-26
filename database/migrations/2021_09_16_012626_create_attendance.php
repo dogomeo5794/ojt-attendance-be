@@ -16,10 +16,10 @@ class CreateAttendance extends Migration
         Schema::create('attendance', function (Blueprint $table) {
             $table->id();
             $table->date("attendance_date");
-            $table->time("time_in_am");
-            $table->time("time_out_am");
-            $table->time("time_in_pm");
-            $table->time("time_out_pm");
+            $table->dateTime("time_in_am")->nullable();
+            $table->dateTime("time_out_am")->nullable();
+            $table->dateTime("time_in_pm")->nullable();
+            $table->dateTime("time_out_pm")->nullable();
             $table->decimal("total_hours")->default(0.0);
             $table->unsignedBigInteger('office_account_id')->index();
             $table->unsignedBigInteger('student_information_id')->index();

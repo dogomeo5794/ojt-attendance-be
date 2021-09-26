@@ -15,7 +15,7 @@ class OfficeAccount extends Model
     ];
 
     public function attendance() {
-        return $this->belongsToMany('App\StudentInformation', 'attendance');
+        return $this->belongsToMany('App\StudentInformation', 'attendance', 'office_account_id', 'student_information_id');
     }
 
     public function account() {

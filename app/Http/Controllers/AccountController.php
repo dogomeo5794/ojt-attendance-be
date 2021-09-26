@@ -29,9 +29,18 @@ class AccountController extends Controller
 
   public function searchExistingCompany(Request $request)
   {
-    $office = OfficeDetail::where("office_registration_id", $request->input('office_registration_id')??"")->first();
+    if ($request->input('request_from') === 'student_assign_office') {
+      $param = $request->input('office_registration_id')??"";
+      $office = OfficeDetail::where("office_registration_id", $param)
+        ->orWhere("office_name", "LIKE", "%".$param."%")
+        ->first();
+    }
+    else {
+      $office = OfficeDetail::where("office_registration_id", $request->input('office_registration_id')??"")->first();
+    }
+
     if (!$office) {
-      return response("no office found".$request->input('office_registration_id'), 404);
+      return response("no office found [".$request->input('office_registration_id')."]", 404);
     }
     return response()->json($office);
   }

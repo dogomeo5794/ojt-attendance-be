@@ -35,7 +35,15 @@ Route::group(['middleware' => 'api', 'prefix' => 'v1'], function ($router) {
      *  Student Controllers
      */
     Route::post('/create-student', 'StudentController@createStudent');
-    Route::get('/create-qr-code', 'StudentController@createQrCode');
+    // Route::get('/create-qr-code', 'StudentController@createQrCode');
+    Route::get('/created-student-list', 'StudentController@createdStudentList');
+    Route::post('/student-info', 'StudentController@collectStudentInfo');
+    Route::post('/assigning-office', 'StudentController@assigningOffice');
+
+    /**
+     * Attendance Controller
+     */
+    Route::post('/checking-attendance', 'AttendanceController@checkingAttendance');
     
     
     // Route::post('/validate-init-reg', 'AccountController@validateInitReg');
