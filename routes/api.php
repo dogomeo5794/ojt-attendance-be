@@ -31,6 +31,12 @@ Route::group(['middleware' => 'api', 'prefix' => 'v1'], function ($router) {
     Route::post('/search-existing-office', 'AccountController@searchExistingCompany');
     Route::post('/check-fresh-app', 'AccountController@checkFreshApp');
 
+    Route::get('/auth-personnel-list', 'AccountController@authPeronnelList');
+    Route::post('/auth-personnel-info', 'AccountController@authPeronnelInfo');
+    Route::post('/change-account-status', 'AccountController@changeAccountStatus');
+
+    
+
     /**
      *  Student Controllers
      */
@@ -44,6 +50,11 @@ Route::group(['middleware' => 'api', 'prefix' => 'v1'], function ($router) {
      * Attendance Controller
      */
     Route::post('/checking-attendance', 'AttendanceController@checkingAttendance');
+
+
+    /**
+     * 
+     */
     
     
     // Route::post('/validate-init-reg', 'AccountController@validateInitReg');

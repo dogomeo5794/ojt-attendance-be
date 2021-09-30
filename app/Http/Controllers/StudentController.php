@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\OfficeAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
@@ -13,6 +14,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 use App\StudentInformation;
 use App\OjtOffice;
+use App\OfficeDetail;
 
 class StudentController extends Controller
 {
@@ -76,6 +78,10 @@ class StudentController extends Controller
 
   public function createdStudentList(Request $request) {
     $per_page = $request->input("per_page")??5;
+    if ($request->input('company_id')) {
+      $office = OfficeAccount::where("company_id", $request->input('company_id'))->first();
+      return response()->json($office->office_details->office()->paginate($per_page));
+    }
     $user_list = StudentInformation::with("office")->orderBy('created_at', 'desc')->paginate($per_page);
     return  response()->json($user_list);
   }

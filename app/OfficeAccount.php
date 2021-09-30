@@ -22,8 +22,12 @@ class OfficeAccount extends Model
         return $this->belongsTo('App\User', 'user_id');
     }
 
+    public function evaluated() {
+        return $this->hasOne('App\AccountEvaluated', 'office_account_id');
+    }
+
     public function office_details() {
-        return $this->belongsTo('App\OfficeDetails', 'office_detail_id');
+        return $this->belongsTo('App\OfficeDetail', 'office_detail_id');
     }
 
     public function account_info()

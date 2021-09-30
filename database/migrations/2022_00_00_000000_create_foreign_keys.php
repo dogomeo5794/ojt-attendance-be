@@ -78,6 +78,23 @@ class CreateForeignKeys extends Migration
 				],
     		)
     	),
+
+		array(
+    		'table' => 'evaluated_account',
+    		'fk' => array(
+    			[
+    				'foreign' => 'office_account_id',
+    				'ref' => 'id',
+    				'on' => 'office_account'
+				],
+				[
+    				'foreign' => 'admin_account_id',
+    				'ref' => 'id',
+    				'on' => 'admin_account'
+				],
+    		)
+    	),
+
     );
 
     public function up()
