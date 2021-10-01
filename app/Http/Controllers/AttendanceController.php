@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
 use App\StudentInformation;
+use App\OfficeAccount;
 use App\Attendance;
 
 class AttendanceController extends Controller
@@ -15,7 +16,7 @@ class AttendanceController extends Controller
   {
     $rule = [
       'student_id' => 'required|exists:student_information,school_id',
-      'personnel_id' => 'required',
+      'personnel_id' => 'required|exists:office_account,company_id',
       'token' => 'required',
     ];
 
@@ -26,8 +27,22 @@ class AttendanceController extends Controller
     }
 
     $student_info = StudentInformation::where("school_id", $request->input('student_id'))->first();
-    $personnel_ids = $request->input('personnel_id');
+    $personnel_info = OfficeAccount::where("company_id", $request->input('personnel_id'))->first();
+    $personnel_ids = $personnel_info->id;
     $datetimeToday = Carbon::now()->toDateTimeString();
+
+    $ojt = $personnel_info->office_details->office()->where('school_id', $request->input('student_id'))->first();
+
+    if (!$student_info OR !$personnel_info OR !$ojt) {
+      return response("QR Code not found!", 404);
+    }
+
+    $fullname = $student_info->school_id." - ".ucwords($student_info->first_name)." ".ucwords($student_info->last_name);
+
+    // return response()->json([
+    //   "student_info" => $student_info,
+    //   "personnel_info" => $personnel_info
+    // ]);
 
 
     // $attendance = Attendance::where([
@@ -75,7 +90,11 @@ class AttendanceController extends Controller
     }
 
     $dateTimeNow = Carbon::now()->format('m/d/Y | h:i A');
-    return response()->json("${time_scan} - ${dateTimeNow}");
+    // return response()->json("${time_scan} - ${dateTimeNow}");
+    return response()->json([
+      "name" => "${fullname}",
+      "time" => "${time_scan} - ${dateTimeNow}"
+    ]);
     
   }
 }

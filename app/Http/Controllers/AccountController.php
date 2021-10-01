@@ -82,7 +82,7 @@ class AccountController extends Controller
 
 
   public function changeAccountStatus(Request $request) {
-    $personnel = OfficeAccount::find($request->input('company_id')??'')->first();
+    $personnel = OfficeAccount::where("company_id", $request->input('company_id')??'')->first();
     if (!$personnel) {
       return response("", 404);
     }
@@ -90,14 +90,15 @@ class AccountController extends Controller
     $status = $request->input('status')??null;
 
     $evaluate = $personnel->evaluated()->first();
+
     if (!$evaluate) {
       $evaluated = new AccountEvaluated();
       $evaluated->action_perform_date = Carbon::now()->toDateString();
       $evaluated->action_perform = $status;
-      $evaluated->office_account_id = $request->input('company_id')??null;
+      $evaluated->office_account_id = $personnel->id;
       $evaluated->admin_account_id = $request->input('admin_id')??null;
       $evaluated->save();
-      return response()->json("Success to ${status} account.");
+      return response()->json("Success to ${status} accountxxx.");
     }
 
     $evaluate->action_perform_date = Carbon::now()->toDateString();
@@ -236,7 +237,7 @@ class AccountController extends Controller
     }
 
     if (!$userInfo) {
-      return  response($request->all(), 404);
+      return  response("Invalid credentials", 404);
     }
 
     $password = hash('sha256', $request->input('password') . $userInfo->company_id);
