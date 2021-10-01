@@ -14,24 +14,24 @@ class AttendanceController extends Controller
 {
   public function checkingAttendance(Request $request)
   {
-    $rule = [
-      'student_id' => 'required|exists:student_information,school_id',
-      'personnel_id' => 'required|exists:office_account,company_id',
-      'token' => 'required',
-    ];
+    // $rule = [
+    //   'student_id' => 'required|exists:student_information,school_id',
+    //   'personnel_id' => 'required|exists:office_account,company_id',
+    //   'token' => 'required',
+    // ];
 
-    $valid = Validator::make($request->all(), $rule);
+    // $valid = Validator::make($request->all(), $rule);
 
-    if ($valid->fails()) {
-      return response($valid->errors(), 500);
-    }
+    // if ($valid->fails()) {
+    //   return response($valid->errors(), 500);
+    // }
 
-    $student_info = StudentInformation::where("school_id", $request->input('student_id'))->first();
-    $personnel_info = OfficeAccount::where("company_id", $request->input('personnel_id'))->first();
+    $student_info = StudentInformation::where("school_id", $request->input('student_id')??"")->first();
+    $personnel_info = OfficeAccount::where("company_id", $request->input('personnel_id')??"")->first();
     $personnel_ids = $personnel_info->id;
     $datetimeToday = Carbon::now()->toDateTimeString();
 
-    $ojt = $personnel_info->office_details->office()->where('school_id', $request->input('student_id'))->first();
+    $ojt = $personnel_info->office_details->office()->where('school_id', $request->input('student_id')??"")->first();
 
     if (!$student_info OR !$personnel_info OR !$ojt) {
       return response("QR Code not found!", 404);
