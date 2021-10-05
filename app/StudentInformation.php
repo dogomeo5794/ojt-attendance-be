@@ -29,12 +29,18 @@ class StudentInformation extends Model
         "year_level",
     ];
 
+    public function attendance_list() {
+        return $this->hasMany('App\Attendance', 'student_information_id');
+    }
+
     public function attendance() {
-        return $this->belongsToMany('App\OfficeAccount', 'attendance');
+        return $this->belongsToMany('App\OfficeAccount', 'attendance', 'student_information_id', 'office_account_id')
+                ->withPivot(['attendance_date', 'time_in_am', 'time_out_am', 'time_in_pm', 'time_out_pm', 'total_hours']);
     }
 
     public function office() {
-        return $this->belongsToMany('App\OfficeDetails', 'office_details');
+        return $this->belongsToMany('App\OfficeDetail', 'ojt_office', 'student_information_id', 'office_detail_id')
+                ->withPivot('duty_status')->withPivot('remarks');
     }
 
     public function qrcode() {

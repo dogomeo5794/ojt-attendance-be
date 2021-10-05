@@ -16,6 +16,7 @@ use App\AdminAccount;
 
 
 use App\Account;
+use App\AccountEvaluated;
 use App\StaffInformation;
 use App\UserInformation;
 use Mockery\Generator\StringManipulation\Pass\Pass;
@@ -25,15 +26,6 @@ class AccountController extends Controller
   public function __construct()
   {
     // $this->middleware('auth:api', ['except' => ['login', 'userLogin', 'staffLogin', 'completeReg', 'validateInitReg']]);
-  }
-
-  public function searchExistingCompany(Request $request)
-  {
-    $office = OfficeDetail::where("office_registration_id", $request->input('office_registration_id')??"")->first();
-    if (!$office) {
-      return response("no office found".$request->input('office_registration_id'), 404);
-    }
-    return response()->json($office);
   }
 
   public function checkFreshApp(Request $request)
@@ -46,6 +38,76 @@ class AccountController extends Controller
       return response("", 200);
     }
   }
+
+
+  /**
+   * Comapany and Auth. Personnel functions
+   */
+
+  public function searchExistingCompany(Request $request)
+  {
+    if ($request->input('request_from') === 'student_assign_office') {
+      $param = $request->input('office_registration_id')??"";
+      $office = OfficeDetail::where("office_registration_id", $param)
+        ->orWhere("office_name", "LIKE", "%".$param."%")
+        ->first();
+    }
+    else {
+      $office = OfficeDetail::where("office_registration_id", $request->input('office_registration_id')??"")->first();
+    }
+
+    if (!$office) {
+      return response("no office found [".$request->input('office_registration_id')."]", 404);
+    }
+    return response()->json($office);
+  }
+
+  public function authPeronnelList(Request $request) {
+    $per_page = $request->input("per_page")??5;
+    $personnel_list = OfficeAccount::with(["evaluated", "office_details.office" => function($query) {
+      $query->where('duty_status', 'active');
+    }])->orderBy('created_at', 'desc')->paginate($per_page);
+    return  response()->json($personnel_list);
+  }
+
+  public function authPeronnelInfo(Request $request) {
+    return response()->json($request->all());
+    // $school_id = $request->input("school_id")??"";
+    // $user_info = StudentInformation::with(["office", "attendance_list"])->where("school_id", $school_id)->first();
+    // if (!$user_info) {
+    //   return response("", 404);
+    // }
+    // return  response()->json($user_info);
+  }
+
+
+  public function changeAccountStatus(Request $request) {
+    $personnel = OfficeAccount::where("company_id", $request->input('company_id')??'')->first();
+    if (!$personnel) {
+      return response("", 404);
+    }
+    
+    $status = $request->input('status')??null;
+
+    $evaluate = $personnel->evaluated()->first();
+
+    if (!$evaluate) {
+      $evaluated = new AccountEvaluated();
+      $evaluated->action_perform_date = Carbon::now()->toDateString();
+      $evaluated->action_perform = $status;
+      $evaluated->office_account_id = $personnel->id;
+      $evaluated->admin_account_id = $request->input('admin_id')??null;
+      $evaluated->save();
+      return response()->json("Success to ${status} accountxxx.");
+    }
+
+    $evaluate->action_perform_date = Carbon::now()->toDateString();
+    $evaluate->action_perform = $status;
+    $evaluate->save();
+
+    return response()->json("Success to ${status} account.");
+  }
+
 
   public function registerAccount(Request $request)
   {
@@ -169,11 +231,13 @@ class AccountController extends Controller
     else {
       $userInfo = OfficeAccount::whereHas("account", function($query) use ($request) {
         $query->where("username", $request->input("username"));
+      })->whereHas("evaluated", function($query) use ($request) {
+        $query->where("action_perform", "approved");
       })->with('account')->first();
     }
 
     if (!$userInfo) {
-      return  response($request->all(), 404);
+      return  response("Invalid credentials", 404);
     }
 
     $password = hash('sha256', $request->input('password') . $userInfo->company_id);

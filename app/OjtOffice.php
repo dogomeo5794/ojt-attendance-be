@@ -11,6 +11,6 @@ class OjtOffice extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'student_information_id', 'office_detail_id'
+        'student_information_id', 'office_detail_id', "duty_status", "remarks"
     ];
 }

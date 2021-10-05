@@ -15,7 +15,8 @@ class OfficeDetail extends Model
     ];
 
     public function office() {
-        return $this->belongsToMany('App\StudentInformation', 'office_details');
+        return $this->belongsToMany('App\StudentInformation', 'ojt_office', 'office_detail_id', 'student_information_id')
+                    ->withPivot('duty_status')->withPivot('remarks');
     }
 
     public function personnels()

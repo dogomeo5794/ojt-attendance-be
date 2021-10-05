@@ -20,7 +20,7 @@ class CreateStudentInformation extends Migration
             $table->string('region');
             $table->string('province');
             $table->string('city');
-            $table->string('barangay');
+            $table->string('barangay')->nullable();
             $table->string('street')->nullable();
             $table->string('first_name');
             $table->string('middle_name');

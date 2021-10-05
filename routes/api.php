@@ -31,11 +31,30 @@ Route::group(['middleware' => 'api', 'prefix' => 'v1'], function ($router) {
     Route::post('/search-existing-office', 'AccountController@searchExistingCompany');
     Route::post('/check-fresh-app', 'AccountController@checkFreshApp');
 
+    Route::get('/auth-personnel-list', 'AccountController@authPeronnelList');
+    Route::post('/auth-personnel-info', 'AccountController@authPeronnelInfo');
+    Route::post('/change-account-status', 'AccountController@changeAccountStatus');
+
+    
+
     /**
      *  Student Controllers
      */
     Route::post('/create-student', 'StudentController@createStudent');
-    Route::get('/create-qr-code', 'StudentController@createQrCode');
+    // Route::get('/create-qr-code', 'StudentController@createQrCode');
+    Route::get('/created-student-list', 'StudentController@createdStudentList');
+    Route::post('/student-info', 'StudentController@collectStudentInfo');
+    Route::post('/assigning-office', 'StudentController@assigningOffice');
+
+    /**
+     * Attendance Controller
+     */
+    Route::post('/checking-attendance', 'AttendanceController@checkingAttendance');
+    Route::post('/fetch-attendance', 'AttendanceController@collectAttendanceByStudent');
+
+    /**
+     * 
+     */
     
     
     // Route::post('/validate-init-reg', 'AccountController@validateInitReg');

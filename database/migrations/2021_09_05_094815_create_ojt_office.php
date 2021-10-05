@@ -15,6 +15,8 @@ class CreateOjtOffice extends Migration
     {
         Schema::create('ojt_office', function (Blueprint $table) {
             $table->id();
+            $table->enum('duty_status', ['active', 'terminated', 'completed'])->default('active');
+            $table->longText('remarks')->nullable();
             $table->unsignedBigInteger('student_information_id')->index();
             $table->unsignedBigInteger('office_detail_id')->index();
             $table->timestamps();
