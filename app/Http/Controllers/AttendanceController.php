@@ -31,9 +31,11 @@ class AttendanceController extends Controller
     $personnel_ids = $personnel_info->id;
     $datetimeToday = Carbon::now()->toDateTimeString();
 
-    $ojt = $personnel_info->office_details->office()->where('school_id', $request->input('student_id')??"")->first();
+    // $ojt = $personnel_info->office_details->office()->where('school_id', $request->input('student_id')??"")->first();
 
-    if (!$student_info OR !$personnel_info OR !$ojt) {
+    // return response()->json($ojt);
+    // if (!$student_info OR !$personnel_info OR !$ojt) {
+    if (!$student_info OR !$personnel_info) {
       return response("QR Code not found!", 404);
     }
 
@@ -96,5 +98,14 @@ class AttendanceController extends Controller
       "time" => "${time_scan} - ${dateTimeNow}"
     ]);
     
+  }
+
+  public function collectAttendanceByStudent(Request $request) {
+    $student_info = StudentInformation::where("school_id", $request->input('student_id')??'')->first();
+    if (!$student_info) {
+      return response("No data found", 404);
+    }
+
+    return response()->json($student_info->attendance_list);
   }
 }

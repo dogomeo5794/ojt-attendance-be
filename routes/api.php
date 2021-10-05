@@ -50,7 +50,7 @@ Route::group(['middleware' => 'api', 'prefix' => 'v1'], function ($router) {
      * Attendance Controller
      */
     Route::post('/checking-attendance', 'AttendanceController@checkingAttendance');
-
+    Route::post('/fetch-attendance', 'AttendanceController@collectAttendanceByStudent');
 
     /**
      * 
