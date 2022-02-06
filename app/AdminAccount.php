@@ -15,17 +15,13 @@ class AdminAccount extends Model
         "last_name", "birthday", "contact_no", "user_id"
     ];
 
-    public function account() {
+    public function account()
+    {
         return $this->belongsTo('App\User', 'user_id');
     }
 
     public function account_info()
     {
         return $this->morphOne('App\User', 'user_info');
-    }
-
-    public function images()
-    {
-        return $this->morphMany('App\Images', 'imageable');
     }
 }

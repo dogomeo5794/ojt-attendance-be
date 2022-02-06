@@ -69,17 +69,6 @@ class CreateForeignKeys extends Migration
     	),
 
 		array(
-    		'table' => 'generated_qrcode',
-    		'fk' => array(
-    			[
-    				'foreign' => 'student_information_id',
-    				'ref' => 'id',
-    				'on' => 'student_information'
-				],
-    		)
-    	),
-
-		array(
     		'table' => 'evaluated_account',
     		'fk' => array(
     			[

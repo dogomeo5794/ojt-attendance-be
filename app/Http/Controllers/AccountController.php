@@ -23,341 +23,392 @@ use Mockery\Generator\StringManipulation\Pass\Pass;
 
 class AccountController extends Controller
 {
-  public function __construct()
-  {
-    // $this->middleware('auth:api', ['except' => ['login', 'userLogin', 'staffLogin', 'completeReg', 'validateInitReg']]);
-  }
-
-  public function checkFreshApp(Request $request)
-  {
-    $admin = User::where('user_type', 'admin')->count();
-    if (!$admin) {
-      return response("", 404);
-    }
-    else {
-      return response("", 200);
-    }
-  }
-
-
-  /**
-   * Comapany and Auth. Personnel functions
-   */
-
-  public function searchExistingCompany(Request $request)
-  {
-    if ($request->input('request_from') === 'student_assign_office') {
-      $param = $request->input('office_registration_id')??"";
-      $office = OfficeDetail::where("office_registration_id", $param)
-        ->orWhere("office_name", "LIKE", "%".$param."%")
-        ->first();
-    }
-    else {
-      $office = OfficeDetail::where("office_registration_id", $request->input('office_registration_id')??"")->first();
+    public function __construct()
+    {
+        // $this->middleware('auth:api', ['except' => ['login', 'userLogin', 'staffLogin', 'completeReg', 'validateInitReg']]);
     }
 
-    if (!$office) {
-      return response("no office found [".$request->input('office_registration_id')."]", 404);
-    }
-    return response()->json($office);
-  }
-
-  public function authPeronnelList(Request $request) {
-    $per_page = $request->input("per_page")??5;
-    $personnel_list = OfficeAccount::with(["evaluated", "office_details.office" => function($query) {
-      $query->where('duty_status', 'active');
-    }])->orderBy('created_at', 'desc')->paginate($per_page);
-    return  response()->json($personnel_list);
-  }
-
-  public function authPeronnelInfo(Request $request) {
-    return response()->json($request->all());
-    // $school_id = $request->input("school_id")??"";
-    // $user_info = StudentInformation::with(["office", "attendance_list"])->where("school_id", $school_id)->first();
-    // if (!$user_info) {
-    //   return response("", 404);
-    // }
-    // return  response()->json($user_info);
-  }
-
-
-  public function changeAccountStatus(Request $request) {
-    $personnel = OfficeAccount::where("company_id", $request->input('company_id')??'')->first();
-    if (!$personnel) {
-      return response("", 404);
-    }
-    
-    $status = $request->input('status')??null;
-
-    $evaluate = $personnel->evaluated()->first();
-
-    if (!$evaluate) {
-      $evaluated = new AccountEvaluated();
-      $evaluated->action_perform_date = Carbon::now()->toDateString();
-      $evaluated->action_perform = $status;
-      $evaluated->office_account_id = $personnel->id;
-      $evaluated->admin_account_id = $request->input('admin_id')??null;
-      $evaluated->save();
-      return response()->json("Success to ${status} accountxxx.");
+    public function checkFreshApp(Request $request)
+    {
+        $admin = User::where('user_type', 'admin')->count();
+        if (!$admin) {
+            return response("", 404);
+        } else {
+            return response("", 200);
+        }
     }
 
-    $evaluate->action_perform_date = Carbon::now()->toDateString();
-    $evaluate->action_perform = $status;
-    $evaluate->save();
 
-    return response()->json("Success to ${status} account.");
-  }
+    /**
+     * Comapany and Auth. Personnel functions
+     */
 
+    public function searchExistingCompany(Request $request)
+    {
+        if ($request->input('request_from') === 'student_assign_office') {
+            $param = $request->input('office_registration_id') ?? "";
+            $office = OfficeDetail::where("office_registration_id", $param)
+                ->orWhere("office_name", "LIKE", "%" . $param . "%")
+                ->first();
+        } else {
+            $office = OfficeDetail::where("office_registration_id", $request->input('office_registration_id') ?? "")->first();
+        }
 
-  public function registerAccount(Request $request)
-  {
-    $rule = [
-      'region' => 'required|string',
-      'province' => 'required|string',
-      'city' => 'required|string',
-      'barangay' => 'required|string',
-      'street' => 'required|string',
-      'first_name' => 'required|string',
-      'middle_name' => 'required|string',
-      'last_name' => 'required|string',
-      'birthday' => 'required|date',
-      'contact_no' => 'required|max:15',
-      'email' => 'required|unique:users,email',
-      'username' => 'required|unique:users,username',
-      'password' => 'min:6|required_with:confirm_password|same:confirm_password',
-      'confirm_password' => 'min:6',
-      'role' => 'required|in:uam-admin,attendance-checker',
-      'user_type' => 'required|in:admin,authorized-personnel',
-      'registration_type' => 'required|in:personnel,admin',
-    ];
-
-    if ($request->input('registration_type')==='personnel') {
-      $rule["office_registration_id"] = "required";
-      $rule["office_name"] = "required|string";
-      $rule["is_new_company"] = "required|boolean";
-      $rule["company_id"] = "required|unique:office_account,company_id";
-      $morph_to = "App\OfficeAccount";
-      $username = $request->input('username');
-    }
-    else if ($request->input('registration_type')==='admin') {
-      $morph_to = "App\AdminAccount";
-      $username = $request->input('company_id');
-      $rule["company_id"] = "required|unique:admin_account,company_id";
+        if (!$office) {
+            return response("no office found [" . $request->input('office_registration_id') . "]", 404);
+        }
+        return response()->json($office);
     }
 
-    $valid = Validator::make($request->all(), $rule);
-
-    if ($valid->fails()) {
-      return response($valid->errors(), 500);
+    public function authPeronnelList(Request $request)
+    {
+        $per_page = $request->input("per_page") ?? 5;
+        $personnel_list = OfficeAccount::with(["evaluated", "office_details.office" => function ($query) {
+            $query->where('duty_status', 'active');
+        }])->orderBy('created_at', 'desc')->paginate($per_page);
+        return  response()->json($personnel_list);
     }
 
-    $password = hash('sha256', $request->input('password') . $request->input('company_id'));
+    public function authPeronnelInfo(Request $request)
+    {
+        $id = $request->input("personnel_id") ?? null;
+        $office = OfficeAccount::with(['evaluated', 'account', 'office_details'])->where('company_id', $id)->first();
+        if (!$office) {
+            return response("", 404);
+        }
+        return  response()->json($office);
+    }
 
-    $user = User::create([
-      'username' =>  $username,
-      'email' =>  $request->input('email'),
-      'role' => $request->input('role'),
-      'user_type' => $request->input('user_type'),
-      'password' => Hash::make($password),
-      'morph_to' => $morph_to,
-    ]);
 
-    if ($request->input('registration_type')==='personnel') {
-      $office_id = $request->input("office_detail_id");
+    public function changeAccountStatus(Request $request)
+    {
+        $personnel = OfficeAccount::where("company_id", $request->input('company_id') ?? '')->first();
+        if (!$personnel) {
+            return response("", 404);
+        }
 
-      if ($request->input('is_new_company')===true) {
-        $office = OfficeDetail::create([
-          "office_registration_id" => $request->input("office_registration_id"),
-          "office_name" => $request->input("office_name"),
-          "region" => $request->input("region"),
-          "province" => $request->input("province"),
-          "city" => $request->input("city"),
-          "barangay" => $request->input("barangay"),
-          "street" => $request->input("street"),
+        $status = $request->input('status') ?? null;
+
+        $evaluate = $personnel->evaluated()->first();
+
+        if (!$evaluate) {
+            $evaluated = new AccountEvaluated();
+            $evaluated->action_perform_date = Carbon::now()->toDateString();
+            $evaluated->action_perform = $status;
+            $evaluated->office_account_id = $personnel->id;
+            $evaluated->admin_account_id = $request->input('admin_id') ?? null;
+            $evaluated->save();
+            return response()->json("Success to ${status} account");
+        }
+
+        $evaluate->action_perform_date = Carbon::now()->toDateString();
+        $evaluate->action_perform = $status;
+        $evaluate->save();
+
+        return response()->json("Success to ${status} account.");
+    }
+
+
+    public function registerAccount(Request $request)
+    {
+        $rule = [
+            'region' => 'required|string',
+            'province' => 'required|string',
+            'city' => 'required|string',
+            'barangay' => 'required|string',
+            'street' => 'required|string',
+            'first_name' => 'required|string',
+            'middle_name' => 'required|string',
+            'last_name' => 'required|string',
+            'birthday' => 'required|date',
+            'contact_no' => 'required|max:15',
+            'email' => 'required|unique:users,email',
+            'username' => 'required|unique:users,username',
+            'password' => 'min:6|required_with:confirm_password|same:confirm_password',
+            'confirm_password' => 'min:6',
+            'role' => 'required|in:uam-admin,attendance-checker',
+            'user_type' => 'required|in:admin,authorized-personnel',
+            'registration_type' => 'required|in:personnel,admin',
+        ];
+
+        if ($request->input('registration_type') === 'personnel') {
+            $rule["office_registration_id"] = "required";
+            $rule["office_name"] = "required|string";
+            $rule["is_new_company"] = "required|boolean";
+            $rule["company_id"] = "required|unique:office_account,company_id";
+            $rule["region"] =  [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->input('is_new_company') === true) {
+                        $fail("The $attribute field is required.");
+                    }
+                }
+            ];
+            $rule["province"] =  [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->input('is_new_company') === true) {
+                        $fail("The $attribute field is required.");
+                    }
+                }
+            ];
+            $rule["city"] =  [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->input('is_new_company') === true) {
+                        $fail("The $attribute field is required.");
+                    }
+                }
+            ];
+            $rule["barangay"] =  [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->input('is_new_company') === true) {
+                        $fail("The $attribute field is required.");
+                    }
+                }
+            ];
+            $rule["street"] =  [
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->input('is_new_company') === true) {
+                        $fail("The $attribute field is required.");
+                    }
+                }
+            ];
+            $morph_to = "App\OfficeAccount";
+            $username = $request->input('username');
+        } else if ($request->input('registration_type') === 'admin') {
+            $morph_to = "App\AdminAccount";
+            $username = $request->input('company_id');
+            $rule["company_id"] = "required|unique:admin_account,company_id";
+        }
+
+        $valid = Validator::make($request->all(), $rule);
+
+        if ($valid->fails()) {
+            return response($valid->errors(), 500);
+        }
+
+        $password = hash('sha256', $request->input('password') . $request->input('company_id'));
+
+        $user = User::create([
+            'username' =>  $username,
+            'email' =>  $request->input('email'),
+            'role' => $request->input('role'),
+            'user_type' => $request->input('user_type'),
+            'password' => Hash::make($password),
+            'morph_to' => $morph_to,
         ]);
 
-        $office_id = $office->id;
-      }
+        if ($request->input('registration_type') === 'personnel') {
+            $office_id = $request->input("office_detail_id");
 
-      $user_info = $user->office_account()->create([
-        "company_id" => $request->input("company_id"),
-        "first_name" => $request->input("first_name"),
-        "middle_name" => $request->input("middle_name"),
-        "last_name" => $request->input("last_name"),
-        "birthday" => $request->input("birthday"),
-        "contact_no" => $request->input("contact_no"),
-        "office_detail_id" => $office_id,
-      ]);
-    }
-    else if ($request->input('registration_type')==='admin') {
-      $user_info = $user->admin_account()->create([
-        "company_id" => $request->input("company_id"),
-        "first_name" => $request->input("first_name"),
-        "middle_name" => $request->input("middle_name"),
-        "last_name" => $request->input("last_name"),
-        "birthday" => $request->input("birthday"),
-        "contact_no" => $request->input("contact_no"),
-        "region" => $request->input("region"),
-        "province" => $request->input("province"),
-        "city" => $request->input("city"),
-        "barangay" => $request->input("barangay"),
-        "street" => $request->input("street"),
-      ]);
-    }
+            if ($request->input('is_new_company') === true) {
+                $office = OfficeDetail::create([
+                    "office_registration_id" => $request->input("office_registration_id"),
+                    "office_name" => $request->input("office_name"),
+                    "region" => $request->input("region"),
+                    "province" => $request->input("province"),
+                    "city" => $request->input("city"),
+                    "barangay" => $request->input("barangay"),
+                    "street" => $request->input("street"),
+                ]);
 
-    return response()->json($user_info->with('account')->get());
-  }
+                $office_id = $office->id;
+            }
 
-  public function userLogin(Request $request)
-  {
-    $rule = [
-      'username' => 'required',
-      'password' => 'required',
-      'login_as' => 'required|in:admin,personnel',
-    ];
+            $user_info = $user->office_account()->create([
+                "company_id" => $request->input("company_id"),
+                "first_name" => $request->input("first_name"),
+                "middle_name" => $request->input("middle_name"),
+                "last_name" => $request->input("last_name"),
+                "birthday" => $request->input("birthday"),
+                "contact_no" => $request->input("contact_no"),
+                "office_detail_id" => $office_id,
+            ]);
+        } else if ($request->input('registration_type') === 'admin') {
+            $user_info = $user->admin_account()->create([
+                "company_id" => $request->input("company_id"),
+                "first_name" => $request->input("first_name"),
+                "middle_name" => $request->input("middle_name"),
+                "last_name" => $request->input("last_name"),
+                "birthday" => $request->input("birthday"),
+                "contact_no" => $request->input("contact_no"),
+                "region" => $request->input("region"),
+                "province" => $request->input("province"),
+                "city" => $request->input("city"),
+                "barangay" => $request->input("barangay"),
+                "street" => $request->input("street"),
+            ]);
+        }
 
-    $valid = Validator::make($request->all(), $rule);
-
-    if ($valid->fails()) {
-      return response($valid->errors(), 500);
-    }
-
-
-    $token = null;
-
-    if ($request->input("login_as")==='admin') {
-      $userInfo = AdminAccount::where("company_id", $request->input("username"))->with('account')->first();
-    }
-    else {
-      $userInfo = OfficeAccount::whereHas("account", function($query) use ($request) {
-        $query->where("username", $request->input("username"));
-      })->whereHas("evaluated", function($query) use ($request) {
-        $query->where("action_perform", "approved");
-      })->with('account')->first();
+        // return response()->json($user_info->with('account')->get());
+        return response()->json($user_info);
     }
 
-    if (!$userInfo) {
-      return  response("Invalid credentials", 404);
+    public function updateInformation(Request $request)
+    {
+        $rule = [
+            'account_id' => 'required|exists:users,id',
+        ];
+
+        $valid = Validator::make($request->all(), $rule);
+
+        if ($valid->fails()) {
+            return response($valid->errors(), 500);
+        }
+
+        $user = User::find($request->input('account_id'));
+        $user->profile = $request->input('profile');
+        $user->save();
+
+        return $user->user_info;
     }
 
-    $password = hash('sha256', $request->input('password') . $userInfo->company_id);
+    public function userLogin(Request $request)
+    {
+        $rule = [
+            'username' => 'required',
+            'password' => 'required',
+            'login_as' => 'required|in:admin,personnel',
+        ];
 
-    if ($token = $this->guard()->attempt([
-      "password" => $password,
-      "username" =>  $request->input("username")
-    ])) {
-      // return $this->respondWithToken($token);
-      return response()->json([
-        'user' => $userInfo,
-        'access_token' => $token,
-        'token_type' => 'bearer',
-        'expires_in' => $this->guard()->factory()->getTTL() * 60
-      ]);
+        $valid = Validator::make($request->all(), $rule);
+
+        if ($valid->fails()) {
+            return response($valid->errors(), 500);
+        }
+
+
+        $token = null;
+
+        if ($request->input("login_as") === 'admin') {
+            $userInfo = AdminAccount::where("company_id", $request->input("username"))->with('account')->first();
+        } else {
+            $userInfo = OfficeAccount::whereHas("account", function ($query) use ($request) {
+                $query->where("username", $request->input("username"));
+            })->whereHas("evaluated", function ($query) use ($request) {
+                $query->where("action_perform", "approved");
+            })->with('account')->first();
+        }
+
+        if (!$userInfo) {
+            return  response("Invalid credentials", 404);
+        }
+
+        $password = hash('sha256', $request->input('password') . $userInfo->company_id);
+
+        if ($token = $this->guard()->attempt([
+            "password" => $password,
+            "username" =>  $request->input("username")
+        ])) {
+            // return $this->respondWithToken($token);
+            return response()->json([
+                'user' => $userInfo,
+                'access_token' => $token,
+                'token_type' => 'bearer',
+                'expires_in' => $this->guard()->factory()->getTTL() * 60
+            ]);
+        }
+
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
 
-    return response()->json(['error' => 'Unauthorized'], 401);
+    public function staffLogin(Request $request)
+    {
+        // $rule = [
+        //   'username' => 'required',
+        //   'password' => 'required',
+        //   'login_as' => 'required|in:uam-admin,staff'
+        // ];
 
-  }
+        // $where = [
+        //   ["company_id", $request->input("username")]
+        // ];
 
-  public function staffLogin(Request $request)
-  {
-    // $rule = [
-    //   'username' => 'required',
-    //   'password' => 'required',
-    //   'login_as' => 'required|in:uam-admin,staff'
-    // ];
+        // if ($request->input('login_as') === 'uam-admin') {
+        //   $rule['login_as'] = "required|in:uam-admin";
+        // }
 
-    // $where = [
-    //   ["company_id", $request->input("username")]
-    // ];
+        // $valid = Validator::make($request->all(), $rule);
 
-    // if ($request->input('login_as') === 'uam-admin') {
-    //   $rule['login_as'] = "required|in:uam-admin";
-    // }
+        // if ($valid->fails()) {
+        //   return response($valid->errors(), 500);
+        // }
 
-    // $valid = Validator::make($request->all(), $rule);
+        // $staffInfo = StaffInformation::where([
+        //   ["company_id", $request->input("username")]
+        // ])
+        //   ->with('account')->first();
 
-    // if ($valid->fails()) {
-    //   return response($valid->errors(), 500);
-    // }
+        // if (!$staffInfo) {
+        //   return  response($request->all(), 404);
+        // }
 
-    // $staffInfo = StaffInformation::where([
-    //   ["company_id", $request->input("username")]
-    // ])
-    //   ->with('account')->first();
+        // $password = hash('sha256', $request->input('password'));
 
-    // if (!$staffInfo) {
-    //   return  response($request->all(), 404);
-    // }
+        // if ($token = $this->guard()->attempt([
+        //   "password" => $password,
+        //   "email" => $staffInfo->account->email
+        // ])) {
+        //   return response()->json([
+        //     'user' => $staffInfo,
+        //     'access_token' => $token,
+        //     'token_type' => 'bearer',
+        //     'expires_in' => $this->guard()->factory()->getTTL() * 60
+        //   ]);
+        // }
 
-    // $password = hash('sha256', $request->input('password'));
+        // return response()->json(['error' => 'Unauthorized'], 401);
 
-    // if ($token = $this->guard()->attempt([
-    //   "password" => $password,
-    //   "email" => $staffInfo->account->email
-    // ])) {
-    //   return response()->json([
-    //     'user' => $staffInfo,
-    //     'access_token' => $token,
-    //     'token_type' => 'bearer',
-    //     'expires_in' => $this->guard()->factory()->getTTL() * 60
-    //   ]);
-    // }
+    }
 
-    // return response()->json(['error' => 'Unauthorized'], 401);
+    public function my_profile()
+    {
+        return response()->json($this->guard()->user());
+    }
 
-  }
+    /**
+     * Log the user out (Invalidate the token)
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout()
+    {
+        $this->guard()->logout();
 
-  public function my_profile()
-  {
-    return response()->json($this->guard()->user());
-  }
+        return response()->json(['message' => 'Successfully logged out']);
+    }
 
-  /**
-   * Log the user out (Invalidate the token)
-   *
-   * @return \Illuminate\Http\JsonResponse
-   */
-  public function logout()
-  {
-    $this->guard()->logout();
+    /**
+     * Refresh a token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
+    {
+        return $this->respondWithToken($this->guard()->refresh());
+    }
 
-    return response()->json(['message' => 'Successfully logged out']);
-  }
+    /**
+     * Get the token array structure.
+     *
+     * @param  string $token
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => $this->guard()->factory()->getTTL() * 60
+        ]);
+    }
 
-  /**
-   * Refresh a token.
-   *
-   * @return \Illuminate\Http\JsonResponse
-   */
-  public function refresh()
-  {
-    return $this->respondWithToken($this->guard()->refresh());
-  }
-
-  /**
-   * Get the token array structure.
-   *
-   * @param  string $token
-   *
-   * @return \Illuminate\Http\JsonResponse
-   */
-  protected function respondWithToken($token)
-  {
-    return response()->json([
-      'access_token' => $token,
-      'token_type' => 'bearer',
-      'expires_in' => $this->guard()->factory()->getTTL() * 60
-    ]);
-  }
-
-  /**
-   * Get the guard to be used during authentication.
-   *
-   * @return \Illuminate\Contracts\Auth\Guard
-   */
-  public function guard()
-  {
-    return Auth::guard();
-  }
+    /**
+     * Get the guard to be used during authentication.
+     *
+     * @return \Illuminate\Contracts\Auth\Guard
+     */
+    public function guard()
+    {
+        return Auth::guard();
+    }
 }

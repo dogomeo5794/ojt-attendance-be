@@ -16,6 +16,8 @@ class CreateStudentInformation extends Migration
         Schema::create('student_information', function (Blueprint $table) {
             $table->id();
             $table->string('school_id', 20)->unique();
+            $table->longText('qr_code')->nullable();
+            $table->longText('profile')->nullable();
             $table->string('email')->unique();
             $table->string('region');
             $table->string('province');
