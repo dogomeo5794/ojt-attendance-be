@@ -245,7 +245,22 @@ class AccountController extends Controller
     public function updateInformation(Request $request)
     {
         $rule = [
+            "account" => "required|in:admin,personnel",
             'account_id' => 'required|exists:users,id',
+            'company_id' => [
+                'required',
+                function ($attribute, $value, $fail) use ($request) {
+                    $userInfo = 0;
+                    if ($request->input("account") === 'admin') {
+                        $userInfo = AdminAccount::where("company_id", $value)->count();
+                    } else {
+                        $userInfo = OfficeAccount::where("company_id", $value)->count();
+                    }
+                    if ($userInfo === 0) {
+                        $fail("The company id field is not exist in our database.");
+                    }
+                }
+            ],
         ];
 
         $valid = Validator::make($request->all(), $rule);
@@ -258,7 +273,17 @@ class AccountController extends Controller
         $user->profile = $request->input('profile');
         $user->save();
 
-        return $user->user_info;
+        if ($request->input("account") === 'admin') {
+            $userInfo = AdminAccount::where("company_id", $request->input("company_id"))
+                ->update($request->except(['account', 'profile', 'account_id']));
+        } else {
+            $userInfo = OfficeAccount::where("company_id", $request->input("company_id"))
+                ->update($request->except(['account', 'profile', 'account_id']));
+        }
+
+        return response()->json([
+            "message" => "Information updated successfully"
+        ]);
     }
 
     public function userLogin(Request $request)
