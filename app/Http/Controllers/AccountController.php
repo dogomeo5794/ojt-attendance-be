@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 
 use App\User;
@@ -136,41 +137,21 @@ class AccountController extends Controller
             $rule["office_name"] = "required|string";
             $rule["is_new_company"] = "required|boolean";
             $rule["company_id"] = "required|unique:office_account,company_id";
-            $rule["region"] =  [
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($request->input('is_new_company') === true) {
-                        $fail("The $attribute field is required.");
-                    }
-                }
-            ];
-            $rule["province"] =  [
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($request->input('is_new_company') === true) {
-                        $fail("The $attribute field is required.");
-                    }
-                }
-            ];
-            $rule["city"] =  [
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($request->input('is_new_company') === true) {
-                        $fail("The $attribute field is required.");
-                    }
-                }
-            ];
-            $rule["barangay"] =  [
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($request->input('is_new_company') === true) {
-                        $fail("The $attribute field is required.");
-                    }
-                }
-            ];
-            $rule["street"] =  [
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($request->input('is_new_company') === true) {
-                        $fail("The $attribute field is required.");
-                    }
-                }
-            ];
+            $rule["region"] = Rule::requiredIf(function () use ($request) {
+                return $request->input('is_new_company') === true;
+            });
+            $rule["province"] = Rule::requiredIf(function () use ($request) {
+                return $request->input('is_new_company') === true;
+            });
+            $rule["city"] = Rule::requiredIf(function () use ($request) {
+                return $request->input('is_new_company') === true;
+            });
+            $rule["barangay"] = Rule::requiredIf(function () use ($request) {
+                return $request->input('is_new_company') === true;
+            });
+            $rule["street"] = Rule::requiredIf(function () use ($request) {
+                return $request->input('is_new_company') === true;
+            });
             $morph_to = "App\OfficeAccount";
             $username = $request->input('username');
         } else if ($request->input('registration_type') === 'admin') {
