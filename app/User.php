@@ -38,15 +38,18 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    public function admin_account() {
+    public function admin_account()
+    {
         return $this->hasOne('App\AdminAccount', 'user_id');
     }
 
-    public function office_account() {
+    public function office_account()
+    {
         return $this->hasOne('App\OfficeAccount', 'user_id');
     }
 
-    public function user_info() {
+    public function user_info()
+    {
         return $this->morphTo(__FUNCTION__, 'morph_to', 'id');
     }
 
@@ -69,5 +72,4 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
-    
 }

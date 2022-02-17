@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 64);
             $table->string('morph_to');
+            $table->longText('profile')->nullable();
             $table->enum('role', ["uam-admin", "attendance-checker"]);
             $table->enum('user_type', ["admin", "authorized-personnel"]);
             $table->rememberToken();
